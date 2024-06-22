@@ -634,5 +634,5 @@ display:
       - id: saver_page
         lambda: |-
           it.fill(Color::BLACK);
-          it.strftime(160, 100, id(my_fontseg2), TextAlign::CENTER, "%H:%M", id(ha_time).now());
+          it.strftime(160, 100, id(font_saver), TextAlign::CENTER, "%H:%M", id(ha_time).now());
 
