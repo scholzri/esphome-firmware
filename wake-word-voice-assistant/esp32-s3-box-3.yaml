@@ -79,6 +79,7 @@ external_components:
 api:
   on_client_connected:
     - script.execute: draw_display
+    - script.execute: saver_enabled
   on_client_disconnected:
     - script.execute: draw_display
 
@@ -111,6 +112,10 @@ button:
     id: factory_reset_btn
     name: Factory reset
 
+time:
+  - platform: homeassistant
+    id: ha_time
+    
 binary_sensor:
   - platform: gpio
     pin:
@@ -183,6 +188,7 @@ voice_assistant:
         id: text_response
         state: "..."
     - script.execute: draw_display
+    - script.execute: saver_enabled
   on_stt_vad_end:
     - lambda: id(voice_assistant_phase) = ${voice_assist_thinking_phase_id};
     - script.execute: draw_display
@@ -320,8 +326,60 @@ script:
           else:
             - display.page.show: initializing_page
             - component.update: s3_box_lcd
-
+ - id: saver_enabled
+    then:
+      - if:
+          condition: 
+            switch.is_on: s_saver 
+          then:
+            - light.turn_on: 
+                id: led
+                brightness: 100%
+            - delay: 30s
+            - light.turn_on: 
+                id: led
+                brightness: 30%
+            - display.page.show: saver_page
+            - component.update: s3_box_lcd
+      - if:
+          condition:
+            - switch.is_on: s_saver_mode            
+          then:
+            - delay: 180s
+            - light.turn_off: led
+    mode: restart 
+      
 switch:
+  - platform: template
+    name: Screensaver
+    id: s_saver
+    optimistic: true    
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      - script.execute: saver_enabled
+    on_turn_off:
+      - script.execute: saver_enabled    
+      
+  - platform: template
+    name: Screensaver_mode
+    id: s_saver_mode
+    optimistic: true    
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      - script.execute: saver_enabled
+    on_turn_off:
+      - script.execute: saver_enabled    
+
+  - platform: template
+    name: Screensaver_mode
+    id: s_saver_presc
+    optimistic: true    
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      - script.execute: saver_enabled
+    on_turn_off:
+      - script.execute: saver_enabled      
+
   - platform: template
     name: Display conversation
     id: display_conversation
@@ -368,7 +426,7 @@ switch:
             - micro_wake_word.stop
             - lambda: id(voice_assistant_phase) = ${voice_assist_muted_phase_id};
             - script.execute: draw_display
-
+    
 select:
   - platform: template
     entity_category: config
@@ -472,7 +530,10 @@ font:
     glyphs: ${allowed_characters}
     id: font_response
     size: 15
-
+  - file: "https://github.com/BigBobbas/ESP32-S3-Box3-Custom-ESPHome/raw/main/fonts/DSEG7Classic-Regular.ttf"
+    id: font_saver
+    size: 90
+    
 text_sensor:
   - id: text_request
     platform: template
@@ -570,3 +631,8 @@ display:
       - id: muted_page
         lambda: |-
           it.fill(Color::BLACK);
+      - id: saver_page
+        lambda: |-
+          it.fill(Color::BLACK);
+          it.strftime(160, 100, id(my_fontseg2), TextAlign::CENTER, "%H:%M", id(ha_time).now());
+
