@@ -338,7 +338,7 @@ script:
             - delay: 30s
             - light.turn_on: 
                 id: led
-                brightness: 30%
+                brightness: 80%
             - display.page.show: saver_page
             - component.update: s3_box_lcd
       - if:
