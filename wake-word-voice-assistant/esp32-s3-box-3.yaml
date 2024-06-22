@@ -326,7 +326,7 @@ script:
           else:
             - display.page.show: initializing_page
             - component.update: s3_box_lcd
- - id: saver_enabled
+  - id: saver_enabled
     then:
       - if:
           condition: 
