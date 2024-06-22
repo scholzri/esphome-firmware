@@ -530,7 +530,10 @@ font:
     glyphs: ${allowed_characters}
     id: font_response
     size: 15
-  - file: "https://github.com/BigBobbas/ESP32-S3-Box3-Custom-ESPHome/raw/main/fonts/DSEG7Classic-Regular.ttf"
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: 300    
     id: font_saver
     size: 90
     
